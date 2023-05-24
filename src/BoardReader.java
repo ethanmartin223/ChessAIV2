@@ -1,7 +1,13 @@
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public abstract class BoardReader {
+
+    public static final byte BLACK_COLOR = 0x0;
+    public static final byte WHITE_COLOR = 0x1;
+
     public static final byte NULL_SPACE = 0x0;
 
     public static final byte BLACK_PAWN = 0x1;
@@ -66,8 +72,10 @@ public abstract class BoardReader {
 
     /** Checks if piece at sX,sY can move or take the piece at dX,dY coordinates */
     private static boolean isValidMove(byte[] board, byte sX, byte sY, byte dX, byte dY) {
-        if (dX > -1 && dY > -1 && dY < 8 && dX < 8)
+        if (dX > -1 && dY > -1 && dY < 8 && dX < 8) {
+            if (getPieceAt(board, dX, dY) == NULL_SPACE) return true;
             return !piecesAreSameColor(board, sX, sY, dX, dY);
+        }
         return false;
     }
 
@@ -125,6 +133,29 @@ public abstract class BoardReader {
                 ty += dir[1];
             }
         }
+    }
+
+    public static Set<byte[]> getAllPieceLocationsByColor(byte[] board, byte color) {
+        Set<byte[]> allPieces = new HashSet<byte[]>();
+        for (int i = 0; i < board.length; i++) {
+            if (board[i]!= NULL_SPACE)
+                if ((color == BLACK_COLOR && board[i] < 0x9) || (color == WHITE_COLOR && board[i] > 0x9))
+                    allPieces.add(new byte[] {(byte) (i%8), (byte) (i/8)});
+        }
+        return allPieces;
+    }
+
+    /** very expensive method -- may need remedied later */
+    public static Map<byte[], Set<byte[]>> getMovesMapForAllPieceLocationsByColor(byte[] board, byte color) {
+        Set<byte[]> allPieces = getAllPieceLocationsByColor(board, color);
+        Map<byte[], Set<byte[]>> outputMap = new HashMap<>();
+        for (byte[] b : allPieces) {
+            outputMap.put(b, new HashSet<>());
+            for (byte[] move : getValidMovesForPieceAtXY(board, b[0], b[1])) {
+                outputMap.get(b).add(move);
+            }
+        }
+        return outputMap;
     }
 
     /* adds all valid moves of lMoves to possibleMoves for the piece at x,y*/
