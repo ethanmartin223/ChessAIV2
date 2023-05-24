@@ -35,7 +35,7 @@ public abstract class BoardReader {
     // All of these assume that board is 8x8
     // a1 is ALWAYS white and considered to be 0th position
 
-    private static byte getIndexForPieceAtXY(byte x, byte y) {
+    public static byte getIndexForPieceAtXY(byte x, byte y) {
         return (byte)(y*8+x);
     }
 
@@ -45,17 +45,17 @@ public abstract class BoardReader {
 
     /** Returns true if the piece at p1X,p1Y is the same color as the piece at p2X,p2Y*/
     private static boolean piecesAreSameColor(byte[] board, byte p1X, byte p1Y, byte p2X, byte p2Y) {
-        return getPieceAt(board, getIndexForPieceAtXY(p1X, p1Y))>0x9 &&
+        return getPieceAt(board, getIndexForPieceAtXY(p1X, p1Y))>0x9 ==
                 getPieceAt(board, getIndexForPieceAtXY(p2X, p2Y))>0x9;
     }
 
     /** Returns the piece byte identifier at the specified index arr**/
-    public static byte getPieceAt(byte[] board, int index) {
+    private static byte getPieceAt(byte[] board, int index) {
         return board[index];
     }
 
     /** Returns the piece byte identifier at the specified x,y coordinates **/
-    public static byte getPieceAt(byte[] board, byte x, byte y) {
+    private static byte getPieceAt(byte[] board, byte x, byte y) {
         return board[getIndexForPieceAtXY(x,y)];
     }
 
@@ -68,6 +68,12 @@ public abstract class BoardReader {
     private static boolean isValidMove(byte[] board, byte sX, byte sY, byte dX, byte dY) {
         if (dX > -1 && dY > -1 && dY < 8 && dX < 8)
             return !piecesAreSameColor(board, sX, sY, dX, dY);
+        return false;
+    }
+
+    private static boolean isValidMoveWithoutTaking(byte[] board, byte sX, byte sY, byte dX, byte dY) {
+        if (dX > -1 && dY > -1 && dY < 8 && dX < 8)
+            return getPieceAt(board, dX, dY) == NULL_SPACE;
         return false;
     }
 
@@ -89,8 +95,24 @@ public abstract class BoardReader {
             case BLACK_KING, WHITE_KING ->     getValidMoveHelper(board, x, y, possibleMoves, ALL_DIR_MOVES);
             case BLACK_ROOK, WHITE_ROOK ->     getValidMoveRayHelper(board, x, y, possibleMoves, HORIZONTAL_MOVES);
             case BLACK_QUEEN, WHITE_QUEEN ->   getValidMoveRayHelper(board, x, y, possibleMoves, ALL_DIR_MOVES);
+            case BLACK_PAWN, WHITE_PAWN ->     getValidMoveForPawn(board, x, y, possibleMoves);
         }
         return possibleMoves;
+    }
+
+    private static void getValidMoveForPawn(byte[] board, byte x, byte y, Set<byte[]> possibleMoves) {
+        byte direction = (byte) (getPieceAt(board, x, y) > 0x9 ? 1 : -1);
+        if (isValidMoveWithoutTaking(board, x, y, x, (byte) (y + direction))) {
+            possibleMoves.add(new byte[]{x, (byte) (y + direction)});
+            if ((y == 1 || y == 6) && isValidMoveWithoutTaking(board, x, y, x, (byte) (y + direction * 2)))
+                possibleMoves.add(new byte[]{x, (byte) (y + direction * 2)});
+        }
+        if (isValidMove(board, x, y, (byte) (x + 1), (byte) (y + direction)) && !(NULL_SPACE == getPieceAt(board, (byte) (x + 1), (byte) (y + direction)))
+                && !piecesAreSameColor(board, x, y, (byte) (x + 1), (byte) (y + direction)))
+            possibleMoves.add(new byte[]{(byte) (x + 1), (byte) (y + direction)});
+        if (isValidMove(board, x, y, (byte) (x - 1), (byte) (y + direction)) && !(NULL_SPACE == getPieceAt(board, (byte) (x - 1), (byte) (y + direction)))
+                && !piecesAreSameColor(board, x, y, (byte) (x - 1), (byte) (y + direction)))
+            possibleMoves.add(new byte[]{(byte) (x - 1), (byte) (y + direction)});
     }
 
     /** Shoots a ray in all directions listed in byte[][] lMoves and returns all possible moves for that direction*/
