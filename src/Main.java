@@ -10,7 +10,7 @@ public class Main {
         //BoardReader.movePiece(currentBoard, (byte)2,(byte)0, (byte)4,(byte) 2);
         currentBoard[BoardReader.getIndexForPieceAtXY((byte)3,(byte)5)] = (byte) 0xA;
         BoardReader.displayBoard(currentBoard);
-        for (byte[] b : BoardReader.getValidMovesForPieceAtXY(currentBoard, (byte) 2, (byte) 6)) {
+        for (byte[] b : BoardReader.getValidMovesForPieceAtXY(currentBoard, (byte) 6, (byte) 0)) {
             System.out.println(Arrays.toString(b));
         }
     }
