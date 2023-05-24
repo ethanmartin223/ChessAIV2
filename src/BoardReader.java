@@ -145,8 +145,8 @@ public abstract class BoardReader {
         outputBoard[0] = WHITE_ROOK;
         outputBoard[1] = WHITE_KNIGHT;
         outputBoard[2] = WHITE_BISHOP;
-        outputBoard[3] = WHITE_KING;
-        outputBoard[4] = WHITE_QUEEN;
+        outputBoard[3] = WHITE_QUEEN;
+        outputBoard[4] = WHITE_KING;
         outputBoard[5] = WHITE_BISHOP;
         outputBoard[6] = WHITE_KNIGHT;
         outputBoard[7] = WHITE_ROOK;
@@ -154,8 +154,8 @@ public abstract class BoardReader {
         outputBoard[56] = BLACK_ROOK;
         outputBoard[57] = BLACK_KNIGHT;
         outputBoard[58] = BLACK_BISHOP;
-        outputBoard[59] = BLACK_KING;
-        outputBoard[60] = BLACK_QUEEN;
+        outputBoard[59] = BLACK_QUEEN;
+        outputBoard[60] = BLACK_KING;
         outputBoard[61] = BLACK_BISHOP;
         outputBoard[62] = BLACK_KNIGHT;
         outputBoard[63] = BLACK_ROOK;
